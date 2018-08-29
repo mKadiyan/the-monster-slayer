@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>VueJs condition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://unpkg.com/vue@2.5.17/dist/vue.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.1/css/bulma.css">
+
+</head>
+
+<body>
+    <div id="app">
+        <section id="progressbars">
+            <div class="container">
+                <div class="columns">
+                    <div class="column">
+                        <h1 class="has-text-centered">YOU</h1>
+                        <progress class="progress is-success is-large" v-bind:value="health" max="100">{{health}}%</progress>
+                    </div>
+                    <div class="column">
+                        <h1 class="has-text-centered">MONSTER</h1>
+                        <progress class="progress  is-success is-large" v-bind:value="monsterHealth" max="100">{{monsterHealth}}100%</progress>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+        <section id="actionbuttons">
+            <div class="container">
+                <div class="columns is-centered box">
+                    <div v-if="gameStarted" class="column is-2">
+                        <a v-on:click="attack(15)" class="button is-danger is-fullwidth">Attack</a>
+                    </div>
+                    <div v-if="gameStarted" class="column is-2">
+                        <a v-on:click="attack(30)" class="button is-info is-fullwidth">Special Attach</a>
+                    </div>
+                    <div v-if="gameStarted" class="column is-2">
+                        <a v-on:click="heal" class="button is-success is-fullwidth">Heal</a>
+                    </div>
+                    <div v-if="gameStarted" class="column is-2">
+                        <a v-on:click="giveUp" class="button is-light is-fullwidth">Give up</a>
+                    </div>
+                    <div v-if="!gameStarted" class="column is-2">
+                        <a v-on:click="startGame" class="button is-link is-fullwidth">Start New Game</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="actionbuttons">
+            <div class="container">
+                <div class="columns is-multiline is-centered box">
+                    <div v-for="(message, index) in messages" class="column notification has-text-centered  is-8" :class='notificationColor(index)'>
+                        {{ message }}
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+</body>
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            gameStarted: false,
+            messages: [],
+            health: 100,
+            monsterHealth: 100
+        },
+        computed: {
+        },
+        methods: {
+            startGame: function () {
+                this.gameStarted = true;
+            },
+            giveUp: function () {
+                this.gameStarted = false;
+                this.messages = [];
+                this.health = 100;
+                this.monsterHealth = 100;
+
+            },
+            attack: function (range) {
+                var monsterHit = -Math.floor(Math.random() * range);
+                var userHit = -Math.floor(Math.random() * range);
+                this.updateHealth(userHit, monsterHit);
+                this.checkWin();
+            },
+            heal: function () {
+                var heal = Math.floor(Math.random() * 10);
+                this.updateHealth(heal, heal);
+            },
+            notificationColor: function (index) {
+                return index % 2 == 0 ? 'is-primary' : 'is-danger';
+            },
+            checkWin: function () {
+                if (this.monsterHealth <= 0 && this.health > 0)
+                    alert('you win!');
+                else if (this.health <= 0 && this.monsterHealth > 0)
+                    alert('monster win!');
+                else if(this.health <= 0 && this.monsterHealth <= 0)
+                    alert('Its a draw!');
+            },
+            updateHealth: function(userHealth, monsterHealth){
+                this.health += userHealth;
+                this.monsterHealth += monsterHealth;
+                this.messages.push(`MONSTER HITS PLAYER FOR ${Math.abs(userHealth)}`);
+                this.messages.push(`PLAYER HITS MONSTER FOR ${Math.abs(monsterHealth)}`);
+            }
+        }
+    });
+</script>
+<style>
+    .container {
+        margin-top: 30px;
+    }
+
+    .progress {
+        border-radius: 0;
+    }
+
+    progress:after {
+        content: attr(value)'%';
+    }
+</style>
+
+</html>
